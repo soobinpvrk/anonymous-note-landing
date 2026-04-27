@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>익명 쪽지 - 걷다보면 누군가의 쪽지가 기다리고 있어요</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:#fff;color:#111;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+:root{
+  --k1:#111;--k2:#222;--k3:#333;--k5:#555;--k7:#777;--k9:#999;
+  --g1:#f2f2f2;--g2:#e8e8e8;--g3:#d4d4d4;
+  --ease:cubic-bezier(.25,.46,.45,.94);--easeb:cubic-bezier(.34,1.56,.64,1);
+}
+.wrap{max-width:1100px;margin:0 auto;padding:0 48px}
+@media(max-width:768px){.wrap{padding:0 24px}}
+.rev{opacity:0;transform:translateY(32px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.rev.in{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}.d4{transition-delay:.28s}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;padding:0 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.nav.on{border-color:var(--g2);box-shadow:0 1px 0 var(--g2)}
+@media(max-width:768px){.nav{padding:0 20px;height:56px}}
+.nlogo{font-size:17px;font-weight:700;letter-spacing:-.4px;color:var(--k1);display:flex;align-items:center;gap:10px}
+.nlogo-mark{width:32px;height:32px;background:var(--k1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
+.nlinks{display:flex;align-items:center;gap:32px}
+.nlinks a{font-size:14px;font-weight:500;color:var(--k5);transition:color .15s}
+.nlinks a:hover{color:var(--k1)}
+@media(max-width:600px){.nlinks{display:none}}
+.ncta{display:inline-flex;align-items:center;gap:6px;background:var(--k1);color:#fff;padding:9px 20px;border-radius:9999px;font-size:13.5px;font-weight:600;transition:opacity .15s,transform .15s var(--easeb)}
+.ncta:hover{opacity:.85;transform:scale(1.02)}
+
+.hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 48px 80px;text-align:center;background:#fff;position:relative;overflow:hidden}
+.hero-inner{position:relative;z-index:1;max-width:740px}
+@media(max-width:768px){.hero{padding:100px 24px 64px}}
+.hbadge{display:inline-flex;align-items:center;gap:8px;background:var(--g1);border-radius:9999px;padding:7px 18px 7px 10px;margin-bottom:40px;animation:fdown .6s var(--ease) both}
+.hbadge-dot{width:22px;height:22px;border-radius:50%;background:var(--k1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:#fff}
+.hbadge span{font-size:13px;font-weight:600;color:var(--k3);letter-spacing:-.1px}
+.htitle{font-size:clamp(3rem,7.5vw,5.5rem);font-weight:800;line-height:1.1;letter-spacing:-2.5px;color:var(--k1);margin-bottom:24px;word-break:keep-all;animation:fup .7s var(--ease) .06s both}
+@media(max-width:600px){.htitle{font-size:2.8rem;letter-spacing:-1.8px}}
+.hsub{font-size:clamp(1rem,2vw,1.15rem);font-weight:400;line-height:1.8;color:var(--k7);margin-bottom:48px;word-break:keep-all;animation:fup .7s var(--ease) .14s both}
+.hactions{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fup .7s var(--ease) .22s both}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--k1);color:#fff;padding:16px 32px;border-radius:9999px;font-size:15px;font-weight:700;letter-spacing:-.3px;box-shadow:0 4px 24px rgba(0,0,0,.15);transition:opacity .15s,transform .2s var(--easeb),box-shadow .2s}
+.btn-p:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.arr{display:inline-flex;transition:transform .15s var(--ease)}
+.btn-p:hover .arr{transform:translateX(3px)}
+.scrl{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:fup .8s var(--ease) .7s both}
+.smouse{width:22px;height:34px;border-radius:11px;border:2px solid var(--g3);position:relative;display:flex;justify-content:center;padding-top:5px}
+.swheel{width:3px;height:7px;background:var(--k9);border-radius:2px;animation:sw 1.6s var(--ease) infinite}
+@keyframes sw{0%{transform:translateY(0);opacity:1}100%{transform:translateY(10px);opacity:0}}
+.slbl{font-size:11px;color:var(--k9);font-weight:500;letter-spacing:.06em}
+
+.stats{background:var(--k1)}
+.stats-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);background:var(--k2)}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr}}
+.stat{background:var(--k1);padding:44px 48px;border-right:1px solid #222}
+.stat:last-child{border-right:none}
+@media(max-width:768px){.stat{padding:32px 24px}}
+.stat-n{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:8px}
+.stat-l{font-size:13.5px;color:rgba(255,255,255,.45);line-height:1.5}
+
+.sec{padding:120px 0}
+@media(max-width:768px){.sec{padding:80px 0}}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--k9);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:'';display:block;width:24px;height:1.5px;background:var(--k9)}
+.stitle{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.18;letter-spacing:-1.2px;color:var(--k1);margin-bottom:16px;word-break:keep-all}
+.sbody{font-size:1.05rem;line-height:1.8;color:var(--k7);word-break:keep-all;max-width:480px}
+
+/* NOTE CARDS */
+.note-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+@media(max-width:900px){.note-grid{grid-template-columns:1fr}}
+.note-card{background:var(--g1);border-radius:28px;padding:36px 32px;transition:transform .25s var(--ease),box-shadow .25s;cursor:default}
+.note-card:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(0,0,0,.08)}
+.note-icon{width:52px;height:52px;background:#fff;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.note-title{font-size:1.05rem;font-weight:700;color:var(--k1);line-height:1.45;margin-bottom:10px;letter-spacing:-.3px}
+.note-desc{font-size:.9rem;color:var(--k7);line-height:1.7}
+
+/* MAP MOCKUP */
+.map-sec{background:var(--k1)}
+.map-inner{max-width:1100px;margin:0 auto;padding:120px 48px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+@media(max-width:768px){.map-inner{grid-template-columns:1fr;gap:48px;padding:80px 24px}}
+.map-kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.map-kicker::before{content:'';display:block;width:24px;height:1.5px;background:rgba(255,255,255,.2)}
+.map-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.18;letter-spacing:-1.2px;color:#fff;margin-bottom:16px;word-break:keep-all}
+.map-body{font-size:1.05rem;line-height:1.8;color:rgba(255,255,255,.45);word-break:keep-all}
+.map-card{background:#1a1a1a;border-radius:28px;padding:32px;position:relative;overflow:hidden;min-height:300px}
+.map-bg{position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(6,1fr);opacity:.15}
+.map-dot{width:4px;height:4px;border-radius:50%;background:#fff;margin:auto}
+.map-pins{position:absolute;inset:0}
+.pin{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #fff;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.15)}
+.pin-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);white-space:nowrap;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:9999px}
+.pin-1{top:25%;left:20%}
+.pin-2{top:45%;left:55%}
+.pin-3{top:65%;left:35%}
+.pin-2 .pin-dot{background:transparent;border-color:rgba(255,255,255,.5);box-shadow:0 0 0 4px rgba(255,255,255,.08)}
+.map-note{position:absolute;bottom:24px;left:24px;right:24px;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:14px}
+.map-note-ico{font-size:1.3rem}
+.map-note-text{font-size:.85rem;color:rgba(255,255,255,.7);line-height:1.5}
+.map-note-text strong{color:#fff;display:block;margin-bottom:2px}
+
+.how-sec-w{background:#fff}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);background:var(--k2);border-radius:28px;overflow:hidden;margin-top:56px}
+@media(max-width:768px){.how-grid{grid-template-columns:1fr;border-radius:24px}}
+.hcard{background:var(--k1);padding:44px 36px;border-right:1px solid #1e1e1e;transition:background .2s}
+.hcard:last-child{border-right:none}
+.hcard:hover{background:#161616}
+@media(max-width:768px){.hcard{padding:32px 28px;border-right:none;border-bottom:1px solid #1e1e1e}}
+.hnum{font-size:12px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.25);margin-bottom:32px;text-transform:uppercase}
+.hico{width:56px;height:56px;border-radius:18px;background:#1e1e1e;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:24px}
+.htitle2{font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-.4px;margin-bottom:12px;line-height:1.35}
+.hdesc{font-size:.9rem;color:rgba(255,255,255,.4);line-height:1.75}
+
+/* GAMIFICATION */
+.game-sec{background:var(--g1)}
+.game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:56px}
+@media(max-width:640px){.game-grid{grid-template-columns:1fr}}
+.gcard{background:#fff;border-radius:28px;padding:36px 32px;box-shadow:0 2px 16px rgba(0,0,0,.05);transition:transform .25s var(--ease),box-shadow .25s;position:relative;overflow:hidden}
+.gcard::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--k1);transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.gcard:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.09)}
+.gcard:hover::after{transform:scaleX(1)}
+.gico{width:52px;height:52px;background:var(--g1);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:24px}
+.gname{font-size:1.05rem;font-weight:700;color:var(--k1);margin-bottom:10px;letter-spacing:-.3px}
+.gdesc{font-size:.9rem;color:var(--k7);line-height:1.75}
+
+.ttags{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.ttag{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:9999px;padding:10px 20px;font-size:14px;font-weight:600;color:var(--k2);box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .15s var(--easeb)}
+.ttag:hover{transform:scale(1.04)}
+
+.faq-list{margin-top:56px}
+.fitem{border-top:1px solid var(--g2)}.fitem:last-child{border-bottom:1px solid var(--g2)}
+.fq{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:28px 0;cursor:pointer;background:none;border:none;text-align:left;font-family:'Pretendard',sans-serif}
+.fq-label{display:flex;align-items:flex-start;gap:16px}
+.fq-mark{font-size:15px;font-weight:800;color:var(--k9);flex-shrink:0;width:20px;padding-top:2px}
+.fq-text{font-size:1rem;font-weight:600;color:var(--k1);letter-spacing:-.3px;line-height:1.5;word-break:keep-all}
+.ficon{width:32px;height:32px;border-radius:50%;background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,transform .3s var(--ease)}
+.fitem.open .ficon{background:var(--k1);transform:rotate(45deg)}
+.ficon svg{width:14px;height:14px;stroke:var(--k5);stroke-width:2.5;fill:none}
+.fitem.open .ficon svg{stroke:#fff}
+.fa{overflow:hidden;max-height:0;transition:max-height .4s var(--ease),opacity .3s;opacity:0}
+.fitem.open .fa{opacity:1}
+.fa-in{padding:0 0 28px 36px}
+.fa-text{font-size:.95rem;color:var(--k7);line-height:1.8;word-break:keep-all}
+
+.cta{background:var(--k1);padding:120px 48px;text-align:center;position:relative;overflow:hidden}
+@media(max-width:768px){.cta{padding:80px 24px}}
+.cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,#1e1e1e 0%,#0a0a0a 100%)}
+.cta-in{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.cta-eye{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:28px}
+.cta-t{font-size:clamp(2rem,5vw,3.6rem);font-weight:800;line-height:1.15;letter-spacing:-1.5px;color:#fff;margin-bottom:20px;word-break:keep-all}
+.cta-s{font-size:1.05rem;line-height:1.75;color:rgba(255,255,255,.45);margin-bottom:48px;word-break:keep-all}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--k1);padding:18px 40px;border-radius:9999px;font-size:15px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:opacity .15s,transform .2s var(--easeb),box-shadow .2s}
+.cta-btn:hover{opacity:.92;transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.cta-note{margin-top:20px;font-size:13px;color:rgba(255,255,255,.25)}
+footer{background:var(--g1);padding:48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+@media(max-width:768px){footer{padding:36px 24px;flex-direction:column;align-items:flex-start}}
+.flogo{font-size:15px;font-weight:700;color:var(--k3);display:flex;align-items:center;gap:10px}
+.flogo-mark{width:28px;height:28px;background:var(--k3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff}
+footer p{font-size:13px;color:var(--k9)}
+@keyframes fup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fdown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="nlogo"><div class="nlogo-mark">&#128140;</div>익명 쪽지</div>
+  <div class="nlinks"><a href="#how">이용 방법</a><a href="#game">게임화</a><a href="#faq">FAQ</a></div>
+  <a href="https://forms.gle/RX97xE8Ck4QzjMMW6" target="_blank" class="ncta">사전 신청 <span class="arr">&#8594;</span></a>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hbadge"><div class="hbadge-dot">&#128205;</div><span>사전 알림 신청 받는 중</span></div>
+    <h1 class="htitle">걷다보면 누군가의<br>쪽지가 기다리고 있어요</h1>
+    <p class="hsub">매일 같은 길도, 오늘은 다를 수 있어요.<br>누군가 지나간 자리에 남긴 익명의 흔적을 발견해보세요.</p>
+    <div class="hactions">
+      <a href="https://forms.gle/RX97xE8Ck4QzjMMW6" target="_blank" class="btn-p">사전 알림 신청하기 <span class="arr">&#8594;</span></a>
+    </div>
+  </div>
+  <div class="scrl"><div class="smouse"><div class="swheel"></div></div><span class="slbl">SCROLL</span></div>
+</section>
+
+<div class="stats">
+  <div class="stats-grid">
+    <div class="stat rev d1"><div class="stat-n">위치 기반</div><div class="stat-l">특정 반경 진입 시<br>쪽지 발견 알림</div></div>
+    <div class="stat rev d2"><div class="stat-n">익명</div><div class="stat-l">신원 없이<br>감정과 생각을 남겨요</div></div>
+    <div class="stat rev d3"><div class="stat-n">게임화</div><div class="stat-l">포인트 &middot; 히든 쪽지<br>지역 클리어</div></div>
+  </div>
+</div>
+
+<section class="sec" id="worry">
+  <div class="wrap">
+    <div class="rev"><p class="kicker">이런 경험 있지 않으세요?</p><h2 class="stitle">반복되는 일상이<br>지겨워질 때</h2></div>
+    <div class="note-grid">
+      <div class="note-card rev d1"><div class="note-icon">&#128694;</div><div class="note-title">출퇴근길이 너무 단조로워요</div><div class="note-desc">매일 같은 길, 같은 풍경. 뭔가 새로운 자극이 필요해요.</div></div>
+      <div class="note-card rev d2"><div class="note-icon">&#128241;</div><div class="note-title">이동 중엔 SNS 스크롤만 반복해요</div><div class="note-desc">뭔가를 소비하지만 아무것도 남지 않는 느낌이에요.</div></div>
+      <div class="note-card rev d3"><div class="note-icon">&#127758;</div><div class="note-title">혼자 산책할 때 외로울 때가 있어요</div><div class="note-desc">현실 공간에서 누군가와 연결되는 경험이 그리워요.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="map-sec">
+  <div class="map-inner">
+    <div class="rev">
+      <p class="map-kicker">서비스 개요</p>
+      <h2 class="map-title">현실 공간에<br>디지털 쪽지를 남겨요</h2>
+      <p class="map-body">특정 위치에 익명으로 쪽지를 드롭하면, 그 반경에 진입한 사람에게 쪽지 발견 알림이 가요. 우연한 발견이 만드는 연결의 재미예요.</p>
+    </div>
+    <div class="map-card rev d2">
+      <div class="map-bg"></div>
+      <div class="map-pins">
+        <div class="pin pin-1"><div class="pin-dot"></div><span class="pin-label">&#128140; 쪽지 발견!</span></div>
+        <div class="pin pin-2"><div class="pin-dot"></div><span class="pin-label">&#128274; 미발견</span></div>
+        <div class="pin pin-3"><div class="pin-dot"></div><span class="pin-label">&#128140; 쪽지 발견!</span></div>
+      </div>
+      <div class="map-note">
+        <span class="map-note-ico">&#128140;</span>
+        <div class="map-note-text"><strong>새로운 쪽지가 근처에 있어요</strong>50m 이내 &middot; 3분 전 드롭됨</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec how-sec-w" id="how">
+  <div class="wrap">
+    <div class="rev"><p class="kicker">이용 방법</p><h2 class="stitle">3단계로<br>쪽지를 발견해요</h2></div>
+    <div class="how-grid rev d1">
+      <div class="hcard"><div class="hnum">STEP 01</div><div class="hico">&#9999;</div><div class="htitle2">쪽지 드롭</div><div class="hdesc">원하는 위치에 익명 쪽지를 남겨요. 감정, 생각, 추천 장소 등 무엇이든 좋아요.</div></div>
+      <div class="hcard"><div class="hnum">STEP 02</div><div class="hico">&#128205;</div><div class="htitle2">위치 기반 발견</div><div class="hdesc">쪽지가 드롭된 반경에 진입하면 알림이 오고, 포인트가 적립돼요.</div></div>
+      <div class="hcard"><div class="hnum">STEP 03</div><div class="hico">&#127775;</div><div class="htitle2">연결과 탐험</div><div class="hdesc">히든 쪽지, 브랜드 스폰서 쪽지, 지역 클리어 등 다양한 발견을 즐겨요.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec game-sec" id="game">
+  <div class="wrap">
+    <div class="rev"><p class="kicker">게임화 요소</p><h2 class="stitle">발견할수록<br>더 재미있어져요</h2><p class="sbody">단순한 쪽지 교환을 넘어, 탐험하는 재미가 있어요.</p></div>
+    <div class="game-grid">
+      <div class="gcard rev d1"><div class="gico">&#127881;</div><div class="gname">포인트 적립</div><div class="gdesc">쪽지를 발견할 때마다 포인트가 적립돼요. 포인트로 특별한 혜택을 받아요.</div></div>
+      <div class="gcard rev d2"><div class="gico">&#128205;</div><div class="gname">지역 클리어</div><div class="gdesc">특정 지역의 모든 쪽지를 발견하면 지역 클리어 뱃지를 획득해요.</div></div>
+      <div class="gcard rev d3"><div class="gico">&#128274;</div><div class="gname">히든 쪽지</div><div class="gdesc">특별한 조건을 만족해야 나타나는 히든 쪽지가 숨어있어요.</div></div>
+      <div class="gcard rev d4"><div class="gico">&#127975;</div><div class="gname">브랜드 스폰서</div><div class="gdesc">주변 브랜드와 상점의 스폰서 쪽지를 발견하면 쿠폰과 혜택을 받아요.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="rev">
+      <p class="kicker">이런 분들을 위해</p>
+      <h2 class="stitle">누구를 위한<br>서비스인가요?</h2>
+      <p class="sbody">반복되는 일상에서 새로운 자극을 원하는 모든 분들을 위해 만들었어요.</p>
+      <div class="ttags">
+        <span class="ttag">&#128694; 출퇴근 &middot; 통학 반복 동선이 있는 분</span>
+        <span class="ttag">&#127796; 혼자 산책 &middot; 여행하는 분</span>
+        <span class="ttag">&#127970; 새로운 동네를 탐험하는 분</span>
+        <span class="ttag">&#128241; 10 &ndash; 30대 디지털 네이티브</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="rev"><p class="kicker">자주 묻는 질문</p><h2 class="stitle">FAQ</h2></div>
+    <div class="faq-list rev d1">
+      <div class="fitem"><button class="fq" onclick="tfaq(this)"><div class="fq-label"><span class="fq-mark">Q</span><span class="fq-text">쪽지 내용이 공개되나요?</span></div><div class="ficon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button><div class="fa"><div class="fa-in"><p class="fa-text">쪽지는 완전 익명으로 운영돼요. 쪽지를 남긴 사람의 신원은 절대 공개되지 않아요. 해당 반경에 진입한 사람만 쪽지를 볼 수 있어요.</p></div></div></div>
+      <div class="fitem"><button class="fq" onclick="tfaq(this)"><div class="fq-label"><span class="fq-mark">Q</span><span class="fq-text">쪽지는 얼마나 오래 유지되나요?</span></div><div class="ficon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button><div class="fa"><div class="fa-in"><p class="fa-text">기본 설정으로 일정 기간 후 자동으로 사라져요. 쪽지를 남길 때 유지 기간을 선택할 수 있고, 포인트를 사용해 연장도 가능해요.</p></div></div></div>
+      <div class="fitem"><button class="fq" onclick="tfaq(this)"><div class="fq-label"><span class="fq-mark">Q</span><span class="fq-text">부적절한 쪽지는 어떻게 처리되나요?</span></div><div class="ficon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></button><div class="fa"><div class="fa-in"><p class="fa-text">신고 시스템과 AI 필터링을 통해 부적절한 콘텐츠를 빠르게 처리해요. 건강한 커뮤니티를 유지하는 게 최우선이에요.</p></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-in rev">
+    <p class="cta-eye">지금 사전 신청하기</p>
+    <h2 class="cta-t">오늘의 길이<br>달라질 거예요</h2>
+    <p class="cta-s">출시 알림을 신청하시면<br>베타 오픈 시 가장 먼저 소식을 전해드려요.</p>
+    <a href="https://forms.gle/RX97xE8Ck4QzjMMW6" target="_blank" class="cta-btn">사전 알림 신청하기 <span class="arr">&#8594;</span></a>
+    <p class="cta-note">무료 &middot; 스팸 없음 &middot; 언제든 취소 가능</p>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo"><div class="flogo-mark">&#128140;</div>익명 쪽지</div>
+  <p>&copy; 2026 익명 쪽지 &middot; 현재 출시 준비 중인 서비스입니다</p>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('on', scrollY > 10), {passive:true});
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}), {threshold:.1, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rev').forEach(el => io.observe(el));
+function tfaq(btn) {
+  const item = btn.closest('.fitem');
+  const ans = item.querySelector('.fa');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.fitem.open').forEach(i => {i.classList.remove('open');i.querySelector('.fa').style.maxHeight='0'});
+  if(!isOpen){item.classList.add('open');ans.style.maxHeight=ans.scrollHeight+'px'}
+}
+</script>
+</body>
+</html>
